@@ -1,0 +1,144 @@
+;****************************************************************************************************************************
+;Program name: "example".  This a library function contained in a single file.  The function receives a null-terminated     *
+;array of char and either verifies that the array can be converted to a 64-bit float or denies that such a conversion is    *
+;possible.  Copyright (C) 2025 Kaitlyn Lee.                                                                              *
+;                                                                                                                           *
+;This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public   *
+;License version 3 as published by the Free Software Foundation.  This program is distributed in the hope that it will be   *
+;useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.*
+;See the GNU Lesser General Public License for more details. A copy of the GNU General Public License v3 is available here: *
+;<https:;www.gnu.org/licenses/>.                            *
+;****************************************************************************************************************************
+;
+;
+;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3**
+;Author information
+;  Author name: Kaitlyn Lee
+;  Author email: kaitlynlee@csu.fullerton.edu
+;
+;Status
+;  This software is not an application program, but rather it is a single function licensed for use by other applications.
+;  This function can be embedded within both FOSS programs and in proprietary programs as permitted by the LGPL.
+
+;Function information
+;  Function name: triangle
+;  Programming language: X86 assembly in Intel syntax.
+;  Date development began:  
+;  Date version 1.0 finished: 
+;  Files of this function: 
+;  System requirements: an X86 platform with nasm installed o other compatible assembler.
+;  Know issues: <now in testing phase>
+;  Assembler used for testing: Nasm version 2.14.02
+;  Prototype: 
+;
+;Purpose
+;  This function doesn't do anything right now
+;
+;Translation information
+;  Assemble: nasm -f elf64 -l example.lis -o example.o example.asm
+;
+;Software design document:
+;  An Execution flow chart accompanies this function.  That document will provide a better understanding of the 
+;  algorithm used in the example function than a direct reading of the source code of the function.
+
+;========= Begin source code ====================================================================================
+;Declarations
+	max equ 40
+
+	extern scanf
+	extern printf
+	extern fgets
+	extern strlen
+	global triangle
+
+segment .data
+;Initialized arrays
+	floatform db "%lf", 0
+	sizes dq 17, 39, 20, 6
+	myname db "John Brown", 0
+	
+	welcome db "Welcome to triangle", 0
+	strform db "%s", 0
+	floatform db "%lf", 0
+
+segment .bss
+;Uninitialized arrays
+	scores resq 38
+	temperatures resw 31
+	pointer resq 1
+	;mov [pointer], 38
+	
+	username resb 24
+
+segment .text
+
+triangle:
+; Back up all the GPRs
+	push    rbp
+	mov     rbp, rsp
+	push    rbx
+	push    rcx
+	push    rdx
+	push    rsi
+	push    rdi
+	push    r8
+	push    r9
+	push    r10
+	push    r11
+	push    r12
+	push    r13
+	push    r14
+	push    r15
+	pushf
+
+;block that welcomes user
+	mov rax, 0
+	mov rdi, strform
+	mov rsi, welcome
+	call printf
+
+
+;block that will input full name
+	mov rax, 0
+	mov rdi, username
+	mov rsi, 22
+	mov rdx, [stdin]
+	call fgets
+	
+;remove newline
+	mov rax, 0
+	mov rdi, username
+	call strlen
+	mov [username+rax-1], byte 0
+	
+	
+;block to read a float from keyboard
+	mov rax, 1
+	mov rdi, floatform
+	push qword 0
+	mov rsi, rsp
+	call scanf
+	movsd xmm9, [rsp]
+	pop rax
+
+
+    
+;Pop all the GPRs
+	popf                                    ;Restore rflags
+	pop rbx                                 ;Restore rbx
+	pop r15                                 ;Restore r15
+	pop r14                                 ;Restore r14
+	pop r13                                 ;Restore r13
+	pop r12                                 ;Restore r12
+	pop r11                                 ;Restore r11
+	pop r10                                 ;Restore r10
+	pop r9                                  ;Restore r9
+	pop r8                                  ;Restore r8
+	pop rcx                                 ;Restore rcx
+	pop rdx                                 ;Restore rdx
+	pop rsi                                 ;Restore rsi
+	pop rdi                                 ;Restore rdi
+	pop rbp  
+    
+	ret
+    
